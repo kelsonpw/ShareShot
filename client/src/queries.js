@@ -13,7 +13,38 @@ export const GET_POSTS = gql`
 `;
 
 /* User Queries */
-
+export const GET_CURRENT_USER = gql`
+  query {
+    getCurrentUser {
+      _id
+      username
+      email
+      password
+      avatar
+      joinDate
+      favorites {
+        _id
+        title
+        imageUrl
+      }
+    }
+  }
+`;
 /* Posts Mutations */
 
 /* Users Mutations */
+export const SIGNIN_USER = gql`
+  mutation($username: String!, $password: String!) {
+    signinUser(username: $username, password: $password) {
+      token
+    }
+  }
+`;
+
+export const SIGNUP_USER = gql`
+  mutation($username: String!, $email: String!, $password: String!) {
+    signinUser(username: $username, email: $email, password: $password) {
+      token
+    }
+  }
+`;

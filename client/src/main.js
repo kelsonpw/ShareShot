@@ -7,11 +7,43 @@ import store from './store';
 import ApolloClient from 'apollo-boost';
 import VueApollo from 'vue-apollo';
 
+import FormAlert from './components/Shared/FormAlert';
+
+// Register global components
+Vue.component('form-alert', FormAlert);
+
 Vue.use(VueApollo);
 
 // Setup ApolloClient
 export const defaultClient = new ApolloClient({
-  uri: 'http://localhost:4000/graphql'
+  uri: 'http://localhost:4000/graphql',
+  // include auth token with request made to backend
+  fetchOptions: {
+    credentials: 'include'
+  },
+  request: operation => {
+    // if no token in localStorage, add it
+    if (!localStorage.token) {
+      localStorage.setItem('token', '');
+    }
+    // operation adds the token to an authorization header
+    operation.setContext({
+      headers: {
+        authorization: localStorage.getItem('token')
+      }
+    });
+  },
+  onError: ({ graphQLErrors, networkError }) => {
+    if (networkError) {
+      console.log('[networkError]', networkError);
+    }
+
+    if (graphQLErrors) {
+      for (let e of graphQLErrors) {
+        console.dir(e);
+      }
+    }
+  }
 });
 
 const apolloProvider = new VueApollo({ defaultClient });
@@ -22,5 +54,9 @@ new Vue({
   apolloProvider,
   router,
   store,
-  render: h => h(App)
+  render: h => h(App),
+  created() {
+    // execute getCurrentUser query
+    this.$store.dispatch('getCurrentUser');
+  }
 }).$mount('#app');
