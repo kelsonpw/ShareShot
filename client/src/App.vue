@@ -7,12 +7,21 @@
         <transition name="fade">
           <router-view />
         </transition>
-        <!-- Auth Snackbar -->
+        <!-- Auth Snackbar  ONLY SHOWS WHEN USER SIGNS IN
+          IT WATCHES FOR USER VALUE TO CHANGE FROM NULL TO VALID
+           -->
         <v-snackbar v-model="authSnackbar" color="success" :timeout="5000" bottom left>
           <v-icon class="mr-3">check_circle</v-icon>
           <h3>You are now signed in!</h3>
-          <v-btn @click="authSnackBar = false" dark flat>Close</v-btn>
+          <v-btn @click="authSnackBar = false" dark>Close</v-btn>
         </v-snackbar>
+
+        <v-snackbar v-if="authError" v-model="authErrorSnackbar" color="error" :timeout="5000" bottom left>
+          <v-icon class="mr-3">cancel</v-icon>
+          <h3>{{authError.message}}</h3>
+          <v-btn dark flat to="/signin">Signin</v-btn>
+        </v-snackbar>
+
       </v-container>
     </main>
   </v-app>
@@ -31,16 +40,22 @@ export default {
   },
   data() {
     return {
-      authSnackbar: false
+      authSnackbar: false,
+      authErrorSnackbar: false
     };
   },
   computed: {
-    ...mapGetters(['user'])
+    ...mapGetters(['user', 'authError'])
   },
   watch: {
     user(newValue, oldValue) {
       if (oldValue === null) {
         this.authSnackbar = true;
+      }
+    },
+    authError(value) {
+      if (value !== null) {
+        this.authErrorSnackbar = true;
       }
     }
   }

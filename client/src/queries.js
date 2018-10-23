@@ -31,6 +31,17 @@ export const GET_CURRENT_USER = gql`
   }
 `;
 /* Posts Mutations */
+export const ADD_POST = gql`
+  mutation($title: String!, $imageUrl: String!, $description: !String, $creatorId: ID!) {
+    addPost(title: $title, imageUrl: $imageUrl, description: $description, creatorId: $creatorId){
+      _id
+      title 
+      imageUrl
+      description
+      creatorId
+    }
+  }
+`;
 
 /* Users Mutations */
 export const SIGNIN_USER = gql`
@@ -43,7 +54,7 @@ export const SIGNIN_USER = gql`
 
 export const SIGNUP_USER = gql`
   mutation($username: String!, $email: String!, $password: String!) {
-    signinUser(username: $username, email: $email, password: $password) {
+    signupUser(username: $username, email: $email, password: $password) {
       token
     }
   }
