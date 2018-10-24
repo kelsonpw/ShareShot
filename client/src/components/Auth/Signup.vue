@@ -18,7 +18,7 @@
     <!-- Signup Form -->
     <v-layout row wrap>
       <v-flex xs12 sm6 offset-sm3>
-        <v-card color="primary" dark>
+        <v-card color="secondary" dark>
           <v-container>
             <v-form v-model="isFormValid" lazy-validation @submit.prevent="handleSignupUser" ref="form">
 

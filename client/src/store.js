@@ -30,9 +30,8 @@ export default new Vuex.Store({
   },
   actions: {
     getCurrentUser: ({ commit }) => {
-      commit('setLoading', true);
       commit('clearError');
-
+      commit('setLoading', true);
       apolloClient
         .query({
           query: GET_CURRENT_USER
@@ -40,17 +39,15 @@ export default new Vuex.Store({
         .then(({ data }) => {
           commit('setLoading', false);
           commit('setUser', data.getCurrentUser);
-          console.log(data.getCurrentUser);
         })
         .catch(err => {
           commit('setLoading', false);
-          commit('setError', err);
           console.error(err);
         });
     },
     getPosts: ({ commit }) => {
-      commit('setLoading', true);
       commit('clearError');
+      commit('setLoading', true);
       // use ApolloClient to fire getPosts query
       apolloClient
         .query({
@@ -65,24 +62,44 @@ export default new Vuex.Store({
         })
         .catch(err => {
           commit('setLoading', false);
-          commit('setError', err);
           console.error(err);
         });
     },
     addPost: ({ commit }, payload) => {
       commit('clearError');
       commit('setLoading', true);
+
       apolloClient
         .mutate({
           mutation: ADD_POST,
-          variables: payload
+          variables: payload,
+          update: (cache, { data: { addPost } }) => {
+            // First read the query you want to update
+            // From this we get entire array of posts from homepage
+            const data = cache.readQuery({ query: GET_POSTS });
+            data.getPosts.unshift(addPost);
+            // Write updated data back to query with the new value
+            console.log(data.getPosts, 'Getpostsdata');
+            cache.writeQuery({
+              query: GET_POSTS,
+              data
+            });
+          },
+          // opt res ensures data written to cache is updated immediatly
+          optimisticResponse: {
+            __typename: 'Mutation',
+            addPost: {
+              __typename: 'Post',
+              _id: -1,
+              ...payload
+            }
+          }
         })
         .then(({ data }) => {
           commit('setLoading', false);
         })
         .catch(err => {
           commit('setLoading', false);
-          commit('setError', err);
           console.error(err);
         });
     },
@@ -137,6 +154,7 @@ export default new Vuex.Store({
         })
         .catch(err => {
           commit('setLoading', false);
+
           commit('setError', err);
           console.error(err);
         });
